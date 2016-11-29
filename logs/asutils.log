@@ -1,0 +1,3 @@
+2016-11-28 11:10:53,376 [ERROR] Usage: server <port>
+2016-11-28 11:10:57,150 [INFO] Starting socket server
+2016-11-28 11:10:57,151 [INFO] Starting zombied resource reaper

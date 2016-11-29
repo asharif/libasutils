@@ -1,0 +1,47 @@
+INTRODUCTION
+
+  A bunch of utils to use with c++.  Right now it consists of the following:
+  
+  1.  Http server - thin c++ wrapper around gnu libmicrohttpd
+  2.  EPOLL client/server  
+  3.  Threadpool
+  4.  Utils - sha1 (wraps boosts), timestamps, timestamp converter, split
+  5.  Buffered reader and writer
+
+Build and run requirements:
+
+  1.  Linux (kernel > 3)
+  2.  GNU toolchain > 5 (gcc-5, g++-5, make) (in distro repo)
+  3.  Boost 1.61.0 with home directory in environment variable $BOOST_CPP_HOME (http://www.boost.org/users/history/version_1_61_0.html)
+    a. We need to build Boost
+      a1. cd $BOOST_CPP_HOME/; ./bootstrap.sh; ./b2
+  4.  GNU libmcirohttpd with home directory in environment variable $LIB_MICROHTTP_HOME (in distro repo)
+    a. apt-get install libmicrohttpd-dev 
+    b. installs in ubuntu under /usr/lib/x86_64-linux-gnu/
+  5.  liblog4cpp with home directory in environment variable $LIB_LOG4CPP_HOME (in distro repo)
+    a. apt-get install liblog4cpp5-dev
+    b. installs in ubuntu under /usr/lib/
+  6.  libuuid with home directory in environment variable $LIB_UUID_HOME (in distro repo)
+    a. apt-get install uuid-dev
+    b. installs in ubuntu under /usr/lib/x86_64-linux-gnu/
+  7. Google unit test with home directory/googletest/ in environment variable $GTEST_HOME (https://github.com/google/googletest)
+        a. Google test comes with both google test and google mock.  We need to build google test framework.
+          a1.  cd $GTEST_HOME/; mkdir build; cd build/; cmake ../; make;
+  8.  To build lib
+    a. make lib
+  9.  To build sample socket server
+    a. make sserver
+  10.  To build sample socket client
+    a. make sclient
+  11. To build sample http server
+    a. make hserver
+
+License:
+
+liblog4cpp = GNU LGPL v2.1
+libmicrohttpd = GNU LGPL v2.1
+boost 1.61.0 = Boost Software License v1.0
+libuuid = GNU LGPL v2.1
+Google Test = BSD 3
+libasutils = GNU LVPL v2.1
+
