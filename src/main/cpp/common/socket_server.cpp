@@ -496,8 +496,8 @@ void SocketServer::reap_resources() {
     std::vector<int32_t> zv;
     for(auto it = this->zm.begin(); it != this->zm.end(); ++it ) {
 
-      //reap after 10 seconds of being marked for death
-     if((Utils::epoch_millis_now() - it->second) > 10000) {
+      //reap after 60 seconds of being marked for death
+     if((Utils::epoch_millis_now() - it->second) > 60000) {
 
         //close and clean resources
         this->close_n_clean(it->first);

@@ -41,27 +41,54 @@ uint64_t Utils::c_epoch_millis(std::string val) {
 
     std::vector<std::string> dt = Utils::split(val, ' ');
 
-    struct tm t = {0};
-    //get the date parts
-    std::vector<std::string> dd = Utils::split(dt[0], '-');
-    t.tm_year = std::stoi(dd[0]) - 1900;
-    t.tm_mon = std::stoi(dd[1]) - 1;
-    t.tm_mday = std::stoi(dd[2]);
+		if(dt.size() == 2) {
 
-    //get time and millis
-    std::vector<std::string> tm = Utils::split(dt[1], ',');
-    uint32_t millis = std::stoi(tm[1]);
+			struct tm t = {0};
+			//get the date parts
+			std::string dp_s = dt[0];
+			std::vector<std::string> dd = Utils::split(dp_s, '-');
+			if(dd.size() == 3) {
 
-    //now get the regular time parts
-    std::vector<std::string> tt = Utils::split(tm[0], ':');
-    t.tm_hour = std::stoi(tt[0]); 
-    t.tm_min = std::stoi(tt[1]); 
-    t.tm_sec = std::stoi(tt[2]); 
-    t.tm_gmtoff = 0;
+				std::string yp_s = dd[0];
+				t.tm_year = std::stoi(yp_s) - 1900;
+				std::string mp_s = dd[1];
+				t.tm_mon = std::stoi(mp_s) - 1;
+				std::string dyp_s = dd[2];
+				t.tm_mday = std::stoi(dyp_s);
 
-    time_t epoch_s = timegm(&t);
+				//get time and millis
+				std::string mtp_s = dt[1];
+				std::vector<std::string> tm = Utils::split(mtp_s, ',');
 
-    result = (uint64_t)epoch_s * 1000 + millis;
+				if(tm.size() == 2) {
+
+					std::string millis_s = tm[1];
+					uint32_t millis = std::stoi(millis_s);
+
+					//now get the regular time parts
+					std::string rtp_s = tm[0];
+					std::vector<std::string> tt = Utils::split(rtp_s, ':');
+					if(tt.size() == 3) {
+
+						std::string rtph_s = tt[0];
+						t.tm_hour = std::stoi(rtph_s); 
+						std::string rtpm_s  = tt[1];
+						t.tm_min = std::stoi(rtpm_s); 
+						std::string rtps_s = tt[2];
+						t.tm_sec = std::stoi(rtps_s); 
+						t.tm_gmtoff = 0;
+
+						time_t epoch_s = timegm(&t);
+
+						result = (uint64_t)epoch_s * 1000 + millis;
+
+					}
+
+				}
+
+			}
+
+		}
 
   } catch(std::exception &e) {
 

@@ -199,10 +199,21 @@ namespace asutils {
       uint32_t connect_to_hosts();
 
       /**
+       * Sends a message on to the node that the node at the index ni.  It will not block but call the resp_callback with a response from the server.
+       * If the server is down it will return false and not make the request
+       */
+      bool send_msg(const char *data, size_t size, uint32_t ni, std::function<void(std::vector<char>)> resp_callback, std::string &uuid_str);
+
+      /**
        * Sends a message on to the node that the hash_key hashes to.  It will not block but call the resp_callback with a response from the server.
        * If the server is down it will return false and not make the request
        */
       bool send_msg(const char *data, size_t size, std::string &hash_key, std::function<void(std::vector<char>)> resp_callback);
+
+      /**
+       * Sends a message on to the node at index ni.  It will block and put response in the result
+       */
+      bool send_msg(const char *data, size_t size, uint32_t ni, std::vector<char> &result, uint64_t to_millis);
 
       /**
        * Sends a message on to the node that the hash_key hashes to.  It will block and put response in the result

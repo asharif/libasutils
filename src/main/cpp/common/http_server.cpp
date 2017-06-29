@@ -6,7 +6,7 @@
 #include <iostream>
 
 #ifdef Linux
-#define USE_EPOLL MHD_USE_EPOLL_LINUX_ONLY
+#define USE_EPOLL MHD_USE_EPOLL
 #else
 #define USE_EPOLL 0
 #endif

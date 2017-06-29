@@ -11,6 +11,22 @@ TEST(UtilsTest, CEpochMillis) {
 
 }
 
+TEST(UtilsTest, CEpochMillisInvalid1) {
+
+  uint64_t epoch_m = Utils::c_epoch_millis("0");
+
+  ASSERT_EQ((uint64_t)0, epoch_m);
+
+}
+
+TEST(UtilsTest, CEpochMillisInvalid2) {
+
+  uint64_t epoch_m = Utils::c_epoch_millis("2016-08-16 23:30:53");
+
+  ASSERT_EQ((uint64_t)0, epoch_m);
+
+}
+
 TEST(UtilsTest, CompareFloatEq) {
 
   float a = 1.256;

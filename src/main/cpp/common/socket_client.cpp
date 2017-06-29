@@ -332,26 +332,32 @@ void SocketClient::read(int32_t ep_sfd, int32_t sfd) {
     //grab a lock and get 'da callback
     this->call_backs_mutex.lock();
 
-    std::function<void(std::vector<char>)> da_callback = this->call_backs[sfd][uuid_str];
-    //remove it from our callback map
+    std::unordered_map<std::string, std::function<void(std::vector<char>&&)>>::iterator cb_iter = this->call_backs[sfd].find(uuid_str);
+    if(cb_iter != this->call_backs[sfd].end()) {
 
-    std::string msg_str(msg_v.begin(), msg_v.end());
-    this->call_backs[sfd].erase(uuid_str);
+      //get a reference to it
+      std::function<void(std::vector<char>)> da_callback = cb_iter->second;
+
+      try {
+
+        std::string msg_str(msg_v.begin(), msg_v.end());
+        //call the callback
+        da_callback(std::move(msg_v)); 
+
+      } catch(std::exception &e) {
+
+        //no callback found! something is wrong with this sfd let's add it to zombied
+        this->a_zombied(sfd);
+        logger.error("Could not locate callback!  This is very very bad!");
+      }
+
+      //and remove it from our callback map
+      this->call_backs[sfd].erase(uuid_str);
+
+    } 
 
     //release the lock
     this->call_backs_mutex.unlock();
-
-    try {
-
-      //call the callback
-      da_callback(std::move(msg_v)); 
-
-    } catch(std::exception &e) {
-
-      //no callback found! something is wrong with this sfd let's add it to zombied
-      this->a_zombied(sfd);
-      logger.error("Could not locate callback!  This is very very bad!");
-    }
 
   };
 
@@ -454,15 +460,25 @@ void SocketClient::write(int32_t ep_sfd, int32_t sfd) {
  */
 bool SocketClient::send_msg(const char *data, size_t size, std::string &hash_key, std::function<void(std::vector<char>)> resp_callback) {
 
+  //lets get the host that this message will be sent to
+  size_t hash =  Utils::hash_it(hash_key);
+  uint32_t ni = hash % this->desired_hosts.size();
+  //grab a uuid to represent this request
+  std::string uuid_str = Utils::build_uuid_str();
+
+  return send_msg(data, size, ni, resp_callback, uuid_str);
+
+}
+
+/**
+ * Sends a message on to the node that is at index ni
+ */
+bool SocketClient::send_msg(const char *data, size_t size, uint32_t ni, std::function<void(std::vector<char>)> resp_callback, std::string &uuid_str) {
+
   bool result = true;
 
-  //lets get the sfd that this message will be sent to
-  size_t hash =  Utils::hash_it(hash_key);
-  uint32_t ni;
   int32_t sfd = -1;
   int32_t ep_sfd = -1;
-
-  ni = hash % this->desired_hosts.size();
 
   //lets check to see if host is healthy
   this->hs_mutex.lock();
@@ -475,9 +491,7 @@ bool SocketClient::send_msg(const char *data, size_t size, std::string &hash_key
     sfd = this->h_status[this->desired_hosts[ni]].sfd;
     ep_sfd = this->h_status[this->desired_hosts[ni]].ep_sfd;
 
-    //grab the uuid first to represent this request
-    std::string uuid_str = Utils::build_uuid_str();
-
+    
     //now let's register the callback.  We will have to deregister it if we can't send
     if(resp_callback != NULL) { 
 
@@ -559,11 +573,30 @@ bool SocketClient::send_msg(const char *data, size_t size, std::string &hash_key
  */
 bool SocketClient::send_msg(const char *data, size_t size, std::string &hash_key, std::vector<char> &result, uint64_t to_millis) {
 
+
+  //lets get the node that this message will be sent to
+  size_t hash =  Utils::hash_it(hash_key);
+  uint32_t ni = hash % this->desired_hosts.size();
+
+  return send_msg(data, size, ni, result, to_millis);
+
+}
+
+/**
+ * Sends a message on to the node at index ni.  It will block and put response in the result
+ */
+bool SocketClient::send_msg(const char *data, size_t size, uint32_t ni, std::vector<char> &result, uint64_t to_millis) {
+
+  //lets get the sfd that we are going to ask
+  int32_t sfd = this->h_status[this->desired_hosts[ni]].sfd;
+
   bool success = false;
   std::mutex sm_mutex;
   std::unique_lock<std::mutex> lck(sm_mutex, std::defer_lock);
   std::condition_variable cv;
   bool ss = false;
+  //grab a uuid to represent this request
+  std::string uuid_str = Utils::build_uuid_str();
   
   std::function<void(std::vector<char>)> call_back = [&success, &result, &cv, &ss](std::vector<char> da_result) {
 
@@ -575,7 +608,7 @@ bool SocketClient::send_msg(const char *data, size_t size, std::string &hash_key
 
   };
 
-  success = send_msg(data, size, hash_key, call_back);
+  success = send_msg(data, size, ni, call_back, uuid_str);
 
   if(success) {
 
@@ -595,6 +628,19 @@ bool SocketClient::send_msg(const char *data, size_t size, std::string &hash_key
     lck.unlock();
 
   }
+
+  //Here we need to make sure to unregister the callback in case of time out.  If we don't the
+  //call_back lamda will contain dangling referenecs and we will certainly sigsegv
+
+  //grab a lock and get 'da callback
+  this->call_backs_mutex.lock();
+
+  //and remove it from our callback map
+  this->call_backs[sfd].erase(uuid_str);
+
+  //release the lock
+  this->call_backs_mutex.unlock();
+
 
   return success;
 
@@ -692,8 +738,8 @@ void SocketClient::reap_resources() {
     std::vector<int32_t> zv;
     for(auto it = this->zm.begin(); it != this->zm.end(); ++it ) {
 
-      //reap after 10 seconds of being marked for death
-      if((Utils::epoch_millis_now() - it->second) > 10000) {
+      //reap after 60 seconds of being marked for death
+      if((Utils::epoch_millis_now() - it->second) > 60000) {
 
         int32_t sfd = it->first;
 

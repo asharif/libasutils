@@ -175,7 +175,7 @@ void SocketUtils::read_from_sfd(int32_t ep_sfd, int32_t sfd, BufferedReader &rea
 
       if(errno == EAGAIN) {
 
-        logger.error(std::string("Could not read from the socket ") + std::to_string(sfd) + std::string(" Waiting for EPOLLIN: ") + std::to_string(errno));
+        logger.info(std::string("Could not read from the socket ") + std::to_string(sfd) + std::string(" Waiting for EPOLLIN: ") + std::to_string(errno));
         
       } else {
         

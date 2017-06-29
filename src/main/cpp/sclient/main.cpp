@@ -73,7 +73,7 @@ void call_block(SocketClient &client, int32_t tc) {
   log4cpp::Category& logger = log4cpp::Category::getRoot();
 
   //ThreadPool p_tp(std::thread::hardware_concurrency());
-  ThreadPool p_tp(200); //if we use more threads then we block less.  leaving this as example
+  ThreadPool p_tp(8); //if we use more threads then we block less.  leaving this as example
 
   int32_t ip_calls = tc;
 
@@ -91,11 +91,11 @@ void call_block(SocketClient &client, int32_t tc) {
       std::string msg = "blah blah";
       std::vector<char> resp;
 
-      bool succss = client.send_msg((char*)msg.c_str(), msg.size(), hash_key, resp, (uint64_t)2000);
+      bool succss = client.send_msg((char*)msg.c_str(), msg.size(), hash_key, resp, (uint64_t)3);
       
       if(!succss) {
 
-        logger.error("Problem sending msg");
+        logger.error("Problem sending msg.  Perhaps timeout");
 
       } else {
 
@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 
   }
 
-  int32_t tc = 100000;
+  int32_t tc = 1000000;
 
   call_block(*client, tc);
   //call_nblock(*client, tc);
