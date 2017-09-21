@@ -7,24 +7,24 @@
 
 namespace asutils {
 
-	class Wrapper {
+  class Wrapper {
 
-		private:
+    private:
 
-			HttpServer *server;
-			HttpRequest *request;
-			HttpResponse *response;
+      HttpServer *server;
+      HttpRequest *request;
+      HttpResponse *response;
 
-		public:
+    public:
 
-			Wrapper(HttpServer* server, HttpRequest* request, HttpResponse* response);
-			~Wrapper();
+      Wrapper(HttpServer* server, HttpRequest* request, HttpResponse* response);
+      ~Wrapper();
 
-			HttpRequest* get_request();
-			HttpResponse* get_response();
-			HttpServer* get_server();
+      HttpRequest* get_request();
+      HttpResponse* get_response();
+      HttpServer* get_server();
 
-	};
+  };
 
 }
 

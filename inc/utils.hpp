@@ -12,6 +12,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/uuid/sha1.hpp>
 #include <log4cpp/Category.hh>
+#include <memory>
+#include <functional>
+#include "buffered_reader.hpp"
 
 namespace asutils {
 
@@ -73,6 +76,12 @@ namespace asutils {
        * This method converts a string to a hex string
        */
       static std::string sha1_hex_str(std::string val);
+
+      /**
+       * This function executes a command on the system through pipes and returns the standard output
+       * int a vector representing each line
+       */
+      static std::vector<std::string> exec(std::string cmd);
 
   };
 

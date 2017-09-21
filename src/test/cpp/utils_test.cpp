@@ -163,3 +163,12 @@ TEST(UtilsTest, Sha1ByteArray) {
   delete[] result;
 
 }
+
+TEST(UtilsTest, Exec) {
+
+  std::vector<std::string> r = Utils::exec("echo 'hello'; echo 'world'");
+
+  ASSERT_EQ(r[0], "hello");
+  ASSERT_EQ(r[1], "world");
+
+}
