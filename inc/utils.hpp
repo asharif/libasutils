@@ -48,6 +48,11 @@ namespace asutils {
       static int8_t compare(const float a, const float b); 
 
       /**
+       * This method compares two doubles
+       */
+      static int8_t compare(const double a, const double b);
+
+      /**
        * This method splits based on a char
        */
       static std::vector<std::string> split(std::string, char d);

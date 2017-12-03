@@ -29,10 +29,10 @@ TEST(UtilsTest, CEpochMillisInvalid2) {
 
 TEST(UtilsTest, CompareFloatEq) {
 
-  float a = 1.256;
-  float b = 1.256;
+  float a = 1.2500006;
+  float b = 1.2500006;
 
-  int8_t r = Utils::compare(a, b);
+  int32_t r = (int32_t)Utils::compare(a, b);
 
   ASSERT_EQ(r, 0);
 
@@ -40,10 +40,10 @@ TEST(UtilsTest, CompareFloatEq) {
 
 TEST(UtilsTest, CompareFloatG) {
 
-  float a = 1.257;
-  float b = 1.256;
+  float a = 1.2500007;
+  float b = 1.2500006;
 
-  int8_t r = Utils::compare(a, b);
+  int32_t r = (int32_t)Utils::compare(a, b);
 
   ASSERT_EQ(r, 1);
 
@@ -51,34 +51,45 @@ TEST(UtilsTest, CompareFloatG) {
 
 TEST(UtilsTest, CompareFloatL) {
 
-  float a = 1.255;
-  float b = 1.256;
+  float a = 1.2500005;
+  float b = 1.2500006;
 
-  int8_t r = Utils::compare(a, b);
+  int32_t r = (int32_t)Utils::compare(a, b);
 
   ASSERT_EQ(r, -1);
 
 }
 
-TEST(UtilsTest, CompareFloatEqG) {
+TEST(UtilsTest, CompareDoubleEq) {
 
-  float a = 1.2565;
-  float b = 1.2560;
+  double a = 1.0000000000000256;
+  double b = 1.0000000000000256;
 
-  int8_t r = Utils::compare(a, b);
+  int32_t r = (int32_t)Utils::compare(a, b);
 
   ASSERT_EQ(r, 0);
 
 }
 
-TEST(UtilsTest, CompareFloatEqL) {
+TEST(UtilsTest, CompareDoubleG) {
 
-  float a = 1.2560;
-  float b = 1.2565;
+  double a = 1.0000000000000257;
+  double b = 1.0000000000000256;
 
-  int8_t r = Utils::compare(a, b);
+  int32_t r = (int32_t)Utils::compare(a, b);
 
-  ASSERT_EQ(r, 0);
+  ASSERT_EQ(r, 1);
+
+}
+
+TEST(UtilsTest, CompareDoubleL) {
+
+  double a = 1.0000000000000256;
+  double b = 1.0000000000000257;
+
+  int32_t r = (int32_t)Utils::compare(a, b);
+
+  ASSERT_EQ(r, -1);
 
 }
 

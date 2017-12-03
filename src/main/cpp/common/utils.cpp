@@ -105,17 +105,47 @@ uint64_t Utils::c_epoch_millis(std::string val) {
  */
 int8_t Utils::compare(const float a, const float b) {
 
-  uint32_t r_a = a * 1000;
-  uint32_t r_b = b * 1000;
+  int8_t result = 0;
+  float epsilon = 0.0000001;
+
+  if(std::abs(a-b) > epsilon) {
+
+
+    if(a < b) {
+
+      result = -1;
+
+    } else {
+
+      result = 1;
+
+    }
+
+  }
+
+  return result;
+
+}
+
+/**
+ * This method compares two doubles
+ */
+int8_t Utils::compare(const double a, const double b) {
 
   int8_t result = 0;
-  if(r_a > r_b) {
+  double epsilon = 0.0000000000000001;
 
-    result = 1;
+  if(std::abs(a-b) > epsilon) {
 
-  } else if(r_a < r_b) {
+    if(a < b) {
 
-    result = -1;
+      result = -1;
+
+    } else {
+
+      result = 1;
+
+    }
 
   }
 
